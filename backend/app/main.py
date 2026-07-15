@@ -1,58 +1,51 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import Base, engine, get_db
-from app.schemas import EmployeeCreate, EmployeeResponse
-from app import crud
+from app.database import Base, engine
+from app.routes import employee
+from app.routes import upload
 
+# Create database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Employee Management API",
-    version="1.0"
+    version="1.0.0"
 )
 
-@app.get("/")
-def home():
-    return {"message":"Employee Management API"}
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],   # For production, replace * with your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# Root Endpoint
+@app.get("/")
+def root():
+    return {
+        "message": "Employee Management API"
+    }
+
+# Health Check Endpoint
 @app.get("/health")
 def health():
-    return {"status":"healthy"}
+    return {
+        "status": "healthy"
+    }
 
-@app.get("/employees", response_model=list[EmployeeResponse])
-def list_employees(db: Session = Depends(get_db)):
-    return crud.get_employees(db)
+# Employee CRUD Routes
+app.include_router(
+    employee.router,
+    prefix="/employees",
+    tags=["Employees"]
+)
 
-@app.get("/employees/{employee_id}", response_model=EmployeeResponse)
-def get_employee(employee_id:int, db: Session = Depends(get_db)):
-    employee = crud.get_employee(db, employee_id)
-
-    if employee is None:
-        raise HTTPException(status_code=404, detail="Employee Not Found")
-
-    return employee
-
-@app.post("/employees", response_model=EmployeeResponse)
-def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
-    return crud.create_employee(db, employee)
-
-@app.put("/employees/{employee_id}", response_model=EmployeeResponse)
-def update_employee(employee_id:int, employee:EmployeeCreate, db:Session=Depends(get_db)):
-
-    updated = crud.update_employee(db, employee_id, employee)
-
-    if updated is None:
-        raise HTTPException(status_code=404, detail="Employee Not Found")
-
-    return updated
-
-@app.delete("/employees/{employee_id}")
-def delete_employee(employee_id:int, db:Session=Depends(get_db)):
-
-    deleted = crud.delete_employee(db, employee_id)
-
-    if deleted is None:
-        raise HTTPException(status_code=404, detail="Employee Not Found")
-
-    return {"message":"Employee Deleted Successfully"}
+# AWS S3 Upload Routes
+app.include_router(
+    upload.router,
+    prefix="/s3",
+    tags=["S3 Upload"]
+)
