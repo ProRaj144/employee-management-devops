@@ -1,0 +1,75 @@
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: employee_db
+      MYSQL_USER: employee
+      MYSQL_PASSWORD: employee123
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    networks:
+      - employee-network
+
+
+  backend:
+    build:
+      context: ./backend
+
+    image: employee-backend:v4
+    container_name: employee-backend
+
+    restart: always
+
+    depends_on:
+      - mysql
+
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: employee_db
+      MYSQL_USER: employee
+      MYSQL_PASSWORD: employee123
+
+    ports:
+      - "8000:8000"
+
+    networks:
+      - employee-network
+
+
+  frontend:
+    build:
+      context: ./frontend
+
+    image: employee-frontend:v1
+    container_name: employee-frontend
+
+    restart: always
+
+    depends_on:
+      - backend
+
+    ports:
+      - "3000:80"
+
+    networks:
+      - employee-network
+
+
+volumes:
+  mysql_data:
+
+
+networks:
+  employee-network:
+    driver: bridge
