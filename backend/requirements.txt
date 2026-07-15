@@ -7,3 +7,4 @@ email-validator
 cryptography
 python-multipart
 boto3
+python-dotenv
