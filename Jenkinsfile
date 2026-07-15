@@ -7,18 +7,13 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Copy Source') {
+        stage('Update Source') {
             steps {
                 sh '''
-                cp -r backend/* $APP_DIR/backend/
-                cp -r frontend/* $APP_DIR/frontend/
-                cp docker-compose.yml $APP_DIR/
+                cd $APP_DIR
+                git config --global --add safe.directory $APP_DIR
+                git fetch origin
+                git reset --hard origin/main
                 '''
             }
         }
@@ -52,7 +47,9 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                sh 'curl http://localhost:8000/health'
+                sh '''
+                curl http://localhost:8000/health
+                '''
             }
         }
     }
