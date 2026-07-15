@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -14,20 +13,17 @@ pipeline {
             }
         }
 
-        stage('Copy Latest Source') {
+        stage('Copy Source') {
             steps {
                 sh '''
-                rm -rf $APP_DIR/backend
-                rm -rf $APP_DIR/frontend
-
-                cp -r backend $APP_DIR/
-                cp -r frontend $APP_DIR/
+                cp -r backend/* $APP_DIR/backend/
+                cp -r frontend/* $APP_DIR/frontend/
                 cp docker-compose.yml $APP_DIR/
                 '''
             }
         }
 
-        stage('Build Backend Image') {
+        stage('Build Backend') {
             steps {
                 sh '''
                 cd $APP_DIR/backend
@@ -36,7 +32,7 @@ pipeline {
             }
         }
 
-        stage('Build Frontend Image') {
+        stage('Build Frontend') {
             steps {
                 sh '''
                 cd $APP_DIR/frontend
