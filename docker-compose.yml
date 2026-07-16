@@ -1,26 +1,5 @@
 services:
 
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    restart: always
-
-    environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: employee_db
-      MYSQL_USER: employee
-      MYSQL_PASSWORD: employee123
-
-    ports:
-      - "3306:3306"
-
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-    networks:
-      - employee-network
-
-
   backend:
     build:
       context: ./backend
@@ -30,15 +9,12 @@ services:
 
     restart: always
 
-    depends_on:
-      - mysql
-
     environment:
-      MYSQL_HOST: mysql
+      MYSQL_HOST: employee-management-db.cwfg442ye0ze.us-east-1.rds.amazonaws.com
       MYSQL_PORT: 3306
       MYSQL_DATABASE: employee_db
-      MYSQL_USER: employee
-      MYSQL_PASSWORD: employee123
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: Employee123
 
     ports:
       - "8000:8000"
@@ -64,10 +40,6 @@ services:
 
     networks:
       - employee-network
-
-
-volumes:
-  mysql_data:
 
 
 networks:
