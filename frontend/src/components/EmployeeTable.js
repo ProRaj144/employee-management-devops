@@ -1,8 +1,8 @@
 function EmployeeTable({ employees }) {
   return (
-    <div className="table-container">
+    <div className="card">
 
-      <h2>Employee List</h2>
+      <h3>Employee Directory</h3>
 
       <table>
 
@@ -14,7 +14,7 @@ function EmployeeTable({ employees }) {
             <th>Email</th>
             <th>Department</th>
             <th>Designation</th>
-            <th>Salary</th>
+            <th>Salary (₹)</th>
           </tr>
         </thead>
 
@@ -33,7 +33,6 @@ function EmployeeTable({ employees }) {
             employees.map((emp) => (
 
               <tr key={emp.id}>
-
                 <td>{emp.id}</td>
                 <td>{emp.first_name}</td>
                 <td>{emp.last_name}</td>
@@ -41,7 +40,6 @@ function EmployeeTable({ employees }) {
                 <td>{emp.department}</td>
                 <td>{emp.designation}</td>
                 <td>₹ {emp.salary}</td>
-
               </tr>
 
             ))

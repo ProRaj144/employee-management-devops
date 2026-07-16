@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 function EmployeeForm({ addEmployee }) {
@@ -34,8 +33,9 @@ function EmployeeForm({ addEmployee }) {
   };
 
   return (
-    <div className="form-container">
-      <h2>Add Employee</h2>
+    <div className="card">
+
+      <h3>Add New Employee</h3>
 
       <form onSubmit={handleSubmit}>
 
@@ -60,7 +60,7 @@ function EmployeeForm({ addEmployee }) {
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="Email Address"
           value={employee.email}
           onChange={handleChange}
           required
@@ -98,6 +98,7 @@ function EmployeeForm({ addEmployee }) {
         </button>
 
       </form>
+
     </div>
   );
 }

@@ -1,13 +1,11 @@
 import axios from "axios";
 
+const API = axios.create({
 
-
-const api = axios.create({
-
-  baseURL: "http://44.211.53.193:8000",
+  baseURL: "http://3.239.224.84:8000",
 
 });
 
 
+export default API;
 
-export default api;
