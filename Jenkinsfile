@@ -118,20 +118,27 @@ pipeline {
 	}
 
         stage('Health Check') {
-            steps {
-                sh '''
-		mkdir -p reports
+	    steps {
+	        sh '''
+	        mkdir -p reports
 
-		sleep 20
-		curl --retry 5 \
+	        echo "======================================"
+	        echo "Checking Application Health"
+	        echo "======================================"
+
+	        sleep 20
+
+	        curl --retry 5 \
 	             --retry-delay 5 \
-		     --retry-connrefused \
-		     --fail \
-		     http://localhost:8000/health \
-	    	     | tee reports/health-report.json"
-           	'''
-	  }	
-        }
+	             --retry-connrefused \
+	             --fail \
+	             http://localhost:8000/health \
+	             | tee reports/health-report.json
+
+        	echo "Application is Healthy"
+	        '''
+	    }
+	}
 
         stage('Manual Approval') {
             steps {
