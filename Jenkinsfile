@@ -16,21 +16,32 @@ pipeline {
             steps { checkout scm }
         }
 
-        stage('Update Source') {
-            steps {
-                sh """
-                cd $APP_DIR
-                git config --global --add safe.directory $APP_DIR
-                git fetch origin
-                git reset --hard origin/main
-                """
-            }
-        }
+        stage('Prepare Workspace') {
+
+    steps {
+
+        sh '''
+
+        echo "========================================"
+
+        echo "Preparing Workspace"
+
+        echo "========================================"
+
+        pwd
+
+        ls -la
+
+        '''
+
+    }
+
+}
 
         stage('Code Quality') {
             steps {
                 sh """
-                cd $APP_DIR/backend
+                cd backend
                 docker build -t employee-backend:test .
                 docker run --rm employee-backend:test flake8 app
                 """
@@ -41,7 +52,7 @@ pipeline {
             steps {
                 sh """
                 mkdir -p $APP_DIR/reports
-                cd $APP_DIR/backend
+                cd backend
                 docker build -t employee-backend:test .
                 docker rm -f backend-test-report >/dev/null 2>&1 || true
                 docker run --name backend-test-report -e PYTHONPATH=/app employee-backend:test python -m pytest tests --junitxml=/app/backend-test-report.xml
@@ -59,13 +70,13 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                sh "cd $APP_DIR/backend && docker build -t $BACKEND_REPO:$IMAGE_TAG -t $BACKEND_REPO:latest ."
+                sh "cd backend && docker build -t $BACKEND_REPO:$IMAGE_TAG -t $BACKEND_REPO:latest ."
             }
         }
 
         stage('Build Frontend') {
             steps {
-                sh "cd $APP_DIR/frontend && docker build -t $FRONTEND_REPO:$IMAGE_TAG -t $FRONTEND_REPO:latest ."
+                sh "cd frontend && docker build -t $FRONTEND_REPO:$IMAGE_TAG -t $FRONTEND_REPO:latest ."
             }
         }
 
@@ -77,13 +88,16 @@ pipeline {
 
         stage('Deploy Development') {
             steps {
-                sh "cd $APP_DIR && docker compose -f docker-compose.dev.yml pull && docker compose -f docker-compose.dev.yml up -d"
+                sh "docker compose -f docker-compose.dev.yml pull
+docker compose -f docker-compose.dev.yml up -d"
             }
         }
 
         stage('Health Check') {
             steps {
-                sh "sleep 20 && curl --retry 5 --retry-delay 5 --retry-connrefused --fail http://localhost:8000/health | tee reports/health-report.json"
+                sh "mkdir -p reports
+sleep 20
+curl --retry 5 --retry-delay 5 --retry-connrefused --fail http://localhost:8000/health | tee reports/health-report.json"
             }
         }
 
@@ -97,7 +111,8 @@ pipeline {
 
         stage('Deploy Production') {
             steps {
-                sh "cd $APP_DIR && docker compose -f docker-compose.dev.yml pull && docker compose -f docker-compose.dev.yml up -d"
+                sh "docker compose -f docker-compose.dev.yml pull
+docker compose -f docker-compose.dev.yml up -d"
             }
         }
     }
