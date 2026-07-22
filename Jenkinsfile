@@ -97,14 +97,25 @@ pipeline {
             }
         }
 
-        stage('Deploy Development') {
-            steps {
-                sh ''' 
-		docker compose -f docker-compose.dev.yml pull
-		docker compose -f docker-compose.dev.yml up -d
-		'''
-            }
-        }
+       stage('Deploy Development') {
+	    steps {
+        	sh '''
+
+	        echo "====================================="
+	        echo "Deploying Development"
+        	echo "====================================="
+
+	        docker compose -f docker-compose.dev.yml down || true
+	
+        	docker rm -f employee-backend employee-frontend >/dev/null 2>&1 || true
+
+	        docker compose -f docker-compose.dev.yml pull
+
+	        docker compose -f docker-compose.dev.yml up -d --remove-orphans
+
+	        '''	
+	    }
+	}
 
         stage('Health Check') {
             steps {
