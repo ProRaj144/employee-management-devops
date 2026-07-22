@@ -136,8 +136,8 @@ pipeline {
 		'''
             }
         }
+     } 
     
-
     post {
         success {
             emailext(to:"sajja.sujith44@gmail.com", subject:"SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}", body:"Deployment completed successfully.")
