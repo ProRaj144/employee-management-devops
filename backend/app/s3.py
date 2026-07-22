@@ -21,16 +21,10 @@ def list_files():
 
     if "Contents" in response:
         for obj in response["Contents"]:
-            files.append({
-                "name": obj["Key"],
-                "size": obj["Size"]
-            })
+            files.append({"name": obj["Key"], "size": obj["Size"]})
 
     return files
 
 
 def delete_file(filename):
-    s3.delete_object(
-        Bucket=BUCKET_NAME,
-        Key=filename
-    )
+    s3.delete_object(Bucket=BUCKET_NAME, Key=filename)

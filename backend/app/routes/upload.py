@@ -12,7 +12,7 @@ async def upload(file: UploadFile = File(...)):
         return {
             "message": "File uploaded successfully",
             "filename": file.filename,
-            "url": file_url
+            "url": file_url,
         }
 
     except Exception as e:
@@ -33,9 +33,7 @@ def remove_file(filename: str):
     try:
         delete_file(filename)
 
-        return {
-            "message": f"{filename} deleted successfully"
-        }
+        return {"message": f"{filename} deleted successfully"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -8,3 +8,6 @@ cryptography
 python-multipart
 boto3
 python-dotenv
+pytest==8.4.2
+httpx
+flake8

@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+
+  backend:
+    image: 345857776164.dkr.ecr.us-east-1.amazonaws.com/employee-backend:latest
+    container_name: employee-backend
+
+    restart: always
+
+    environment:
+      MYSQL_HOST: employee-management-db.cwfg442ye0ze.us-east-1.rds.amazonaws.com
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: employee_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: Employee123
+
+    ports:
+      - "8000:8000"
+
+  frontend:
+    image: 345857776164.dkr.ecr.us-east-1.amazonaws.com/employee-frontend:latest
+    container_name: employee-frontend
+
+    restart: always
+
+    depends_on:
+      - backend
+
+    ports:
+      - "3000:80"

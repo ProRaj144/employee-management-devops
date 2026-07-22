@@ -5,22 +5,27 @@ from app.database import Base, engine
 from app.routes import employee
 from app.routes import upload
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(
     title="Employee Management API",
     version="1.0.0"
 )
 
+
+# Create database tables when the application starts
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
+
+
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # For production, replace * with your frontend URL
+    allow_origins=["*"],  # Replace * with frontend URL in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Root Endpoint
 @app.get("/")
@@ -29,6 +34,7 @@ def root():
         "message": "Employee Management API"
     }
 
+
 # Health Check Endpoint
 @app.get("/health")
 def health():
@@ -36,12 +42,14 @@ def health():
         "status": "healthy"
     }
 
+
 # Employee CRUD Routes
 app.include_router(
     employee.router,
     prefix="/employees",
     tags=["Employees"]
 )
+
 
 # AWS S3 Upload Routes
 app.include_router(

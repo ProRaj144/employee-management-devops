@@ -26,7 +26,9 @@ def get_employee(employee_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{employee_id}")
-def update_employee(employee_id: int, employee: schemas.EmployeeCreate, db: Session = Depends(get_db)):
+def update_employee(
+    employee_id: int, employee: schemas.EmployeeCreate, db: Session = Depends(get_db)
+):
     updated = crud.update_employee(db, employee_id, employee)
     if not updated:
         raise HTTPException(status_code=404, detail="Employee not found")
