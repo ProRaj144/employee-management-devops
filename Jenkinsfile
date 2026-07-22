@@ -47,20 +47,30 @@ pipeline {
                 """
             }
         }
-
         stage('Backend Tests') {
-            steps {
-                sh """
-                mkdir -p $APP_DIR/reports
+           steps {
+                sh '''
+                mkdir -p reports
+
                 cd backend
+
                 docker build -t employee-backend:test .
+
                 docker rm -f backend-test-report >/dev/null 2>&1 || true
-                docker run --name backend-test-report -e PYTHONPATH=/app employee-backend:test python -m pytest tests --junitxml=/app/backend-test-report.xml
-                docker cp backend-test-report:/app/backend-test-report.xml $APP_DIR/reports/backend-test-report.xml
+
+                docker run \
+                --name backend-test-report \
+                -e PYTHONPATH=/app \
+                employee-backend:test \
+                python -m pytest tests \
+                --junitxml=/app/backend-test-report.xml
+
+                docker cp backend-test-report:/app/backend-test-report.xml reports/backend-test-report.xml
+
                 docker rm backend-test-report
-                """
-            }
-        }
+                '''
+              }  
+         }
 
         stage('Verify Docker') {
             steps {
@@ -148,8 +158,10 @@ pipeline {
         }
 
         always {
-            archiveArtifacts artifacts:'reports/**/*', fingerprint:true
-            junit allowEmptyResults:true, testResults:'reports/backend-test-report.xml'
+            archiveArtifacts artifacts:'reports/**/*', fingerprint: true
+
+            junit allowEmptyResults:true,
+		  testResults:'reports/backend-test-report.xml'
         }
     }
 }
