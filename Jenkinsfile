@@ -88,17 +88,27 @@ pipeline {
 
         stage('Deploy Development') {
             steps {
-                sh "docker compose -f docker-compose.dev.yml pull
-docker compose -f docker-compose.dev.yml up -d"
+                sh ''' 
+		docker compose -f docker-compose.dev.yml pull
+		docker compose -f docker-compose.dev.yml up -d
+		'''
             }
         }
 
         stage('Health Check') {
             steps {
-                sh "mkdir -p reports
-sleep 20
-curl --retry 5 --retry-delay 5 --retry-connrefused --fail http://localhost:8000/health | tee reports/health-report.json"
-            }
+                sh '''
+		mkdir -p reports
+
+		sleep 20
+		curl --retry 5 \
+	             --retry-delay 5 \
+		     --retry-connrefused \
+		     --fail \
+		     http://localhost:8000/health \
+	    	     | tee reports/health-report.json"
+           	'''
+	  }	
         }
 
         stage('Manual Approval') {
@@ -123,7 +133,7 @@ docker compose -f docker-compose.dev.yml up -d"
         }
 
         failure {
-            emailext(to:"YOUR_GMAIL@gmail.com", subject:"FAILED: ${JOB_NAME} #${BUILD_NUMBER}", body:"Pipeline failed. Check Jenkins console.")
+            emailext(to:"sajja.sujith44@gmail.com", subject:"FAILED: ${JOB_NAME} #${BUILD_NUMBER}", body:"Pipeline failed. Check Jenkins console.")
         }
 
         always {
