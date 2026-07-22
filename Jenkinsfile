@@ -121,11 +121,22 @@ pipeline {
 
         stage('Deploy Production') {
             steps {
-                sh "docker compose -f docker-compose.dev.yml pull
-docker compose -f docker-compose.dev.yml up -d"
+                sh '''
+		
+		echo "======================================"
+		
+		echo "Deploying to production"
+
+		echo "======================================"
+
+		docker compose -f docker-compose.dev.yml pull
+
+		docker compose -f docker-compose.dev.yml up -d
+
+		'''
             }
         }
-    }
+    
 
     post {
         success {
