@@ -47,31 +47,32 @@ pipeline {
                 """
             }
         }
-        stage('Backend Tests') {
-           steps {
-                sh '''
-                mkdir -p reports
+       	stage('Backend Tests') {
+    	    steps {
+	        sh '''
+        	mkdir -p "$WORKSPACE/reports"
 
-                cd backend
+	        cd backend
 
-                docker build -t employee-backend:test .
+	        docker build -t employee-backend:test .
 
-                docker rm -f backend-test-report >/dev/null 2>&1 || true
+        	docker rm -f backend-test-report >/dev/null 2>&1 || true
 
-                docker run \
-                --name backend-test-report \
-                -e PYTHONPATH=/app \
-                employee-backend:test \
-                python -m pytest tests \
-                --junitxml=/app/backend-test-report.xml
+	        docker run \
+        	  --name backend-test-report \
+	          -e PYTHONPATH=/app \
+        	  employee-backend:test \
+	          python -m pytest tests \
+        	  --junitxml=/app/backend-test-report.xml
 
-                docker cp backend-test-report:/app/backend-test-report.xml reports/backend-test-report.xml
+	        docker cp \
+        	  backend-test-report:/app/backend-test-report.xml \
+	          "$WORKSPACE/reports/backend-test-report.xml"
 
-                docker rm backend-test-report
-                '''
-              }  
-         }
-
+        	docker rm backend-test-report
+	        '''
+	       }
+	    }
         stage('Verify Docker') {
             steps {
                 sh "docker --version && docker compose version"
