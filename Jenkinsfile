@@ -47,6 +47,35 @@ pipeline {
                 """
             }
         }
+	
+	stage('SonarQube Analysis') {
+	    steps {
+	       	 script {
+	            def scannerHome = tool 'SonarScanner'
+
+	            withSonarQubeEnv('SonarQube') {
+
+	                sh """
+	                ${scannerHome}/bin/sonar-scanner \
+	                -Dsonar.projectKey=employee-management \
+	                -Dsonar.projectName=employee-management \
+	                -Dsonar.projectVersion=1.0 \
+	                -Dsonar.sources=backend/app \
+	                -Dsonar.python.version=3.11 \
+	                -Dsonar.host.url=http://34.201.114.252:9000
+	                """
+	            }
+	        }
+	    }
+	}
+
+	stage('Quality Gate') {
+	    steps {
+	        timeout(time: 5, unit: 'MINUTES') {
+	            waitForQualityGate abortPipeline: true
+	        }
+	    }
+	}
        	stage('Backend Tests') {
     	    steps {
 	        sh '''
