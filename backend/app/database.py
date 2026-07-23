@@ -9,8 +9,13 @@ DATABASE_URL = (
     f"{settings.MYSQL_PORT}/"
     f"{settings.MYSQL_DATABASE}"
 )
-
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=3600,
+    pool_size=5,
+    max_overflow=10,
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
