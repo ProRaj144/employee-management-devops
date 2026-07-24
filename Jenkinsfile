@@ -40,43 +40,42 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            options {
-                timeout(time: 20, unit: 'MINUTES')
-            }
+	stage('SonarQube Analysis') {
+    options {
+        timeout(time: 20, unit: 'MINUTES')
+    }
 
-            steps {
-                script {
-                    def scannerHome = tool 'SonarScanner'
+	    steps {
+	        script {
+	            def scannerHome = tool 'SonarScanner'
 
-                    withSonarQubeEnv('SonarQube') {
+	            withSonarQubeEnv('SonarQube') {
 
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=employee-management \
-                        -Dsonar.projectName=employee-management \
-                        -Dsonar.projectVersion=${BUILD_NUMBER} \
-                        -Dsonar.sources=backend/app \
-                        -Dsonar.python.version=3.11 \
-                        -Dsonar.host.url=http://34.201.114.252:9000
-                        """
-                    }
-                }
-            }
-        }
+	                sh """
+	                ${scannerHome}/bin/sonar-scanner \
+	                  -Dsonar.projectKey=employee-management \
+	                  -Dsonar.projectName=employee-management \
+	                  -Dsonar.projectVersion=${BUILD_NUMBER} \
+	                  -Dsonar.sources=backend/app \
+	                  -Dsonar.python.version=3.11
+	                """
+	            }
+	        }
+	    }
+	}
 
-        stage('Quality Gate') {
-            steps {
-                script {
-                    echo "Waiting for SonarQube to process analysis..."
-                    sleep 10
-                }
+	stage('Quality Gate') {
+	    steps {
+	        script {
+	            echo "Waiting for SonarQube Quality Gate..."
+	            sleep 15
+	        }
 
-                timeout(time: 30, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+	        timeout(time: 30, unit: 'MINUTES') {
+	            waitForQualityGate abortPipeline: true
+	        }
+	    }
+	}
 
         stage('Backend Tests') {
             steps {
